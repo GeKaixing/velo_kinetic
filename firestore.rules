@@ -1,0 +1,48 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    match /users/{userId} {
+      allow get: if isOwner(userId);
+      allow create, update: if isOwner(userId) && isValidUser(request.resource.data);
+      
+      match /rides/{rideId} {
+        allow list: if isOwner(userId);
+        allow get: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidRide(request.resource.data);
+        allow delete: if isOwner(userId);
+      }
+    }
+
+    function isValidUser(data) {
+      return data.uid == request.auth.uid 
+        && data.email is string 
+        && data.keys().hasAll(['uid', 'email', 'createdAt'])
+        && data.keys().size() <= 6;
+    }
+
+    function isValidRide(data) {
+      return data.userId == request.auth.uid
+        && data.name is string && data.name.size() <= 100
+        && data.distanceKm is number
+        && data.path is list && data.path.size() > 0
+        && data.keys().hasAll(['userId', 'name', 'distanceKm', 'path', 'createdAt'])
+        && data.keys().size() <= 10;
+    }
+  }
+}

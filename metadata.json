@@ -1,0 +1,9 @@
+{
+  "name": "VELO.KINETIC",
+  "description": "Elite Performance Neural Routing Engine for professional cycling, featuring AI-powered structured navigation and real-time biometric metrics.",
+  "requestFramePermissions": [
+    "geolocation",
+    "microphone"
+  ],
+  "majorCapabilities": []
+}

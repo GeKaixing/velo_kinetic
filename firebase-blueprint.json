@@ -1,0 +1,55 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User profile and settings",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "email": { "type": "string" },
+        "name": { "type": "string" },
+        "photoURL": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "email"]
+    },
+    "RideHistory": {
+      "title": "Ride History",
+      "description": "Saved cycling routes and performance logs",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "name": { "type": "string" },
+        "distanceKm": { "type": "number" },
+        "elevationGainM": { "type": "number" },
+        "description": { "type": "string" },
+        "path": { 
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "lat": { "type": "number" },
+              "lng": { "type": "number" }
+            }
+          }
+        },
+        "elevationProfile": {
+          "type": "array",
+          "items": { "type": "number" }
+        },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "name", "distanceKm", "path"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "User specific data"
+    },
+    "/users/{userId}/rides/{rideId}": {
+      "schema": "RideHistory",
+      "description": "User's ride history"
+    }
+  }
+}
