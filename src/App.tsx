@@ -139,8 +139,13 @@ export default function App() {
   const handleAnonymously = async () => {
     try {
       await signInAnonymously(auth);
-    } catch (e) {
+    } catch (e: any) {
       console.error("Anonymous sign-in failed:", e);
+      if (e.code === 'auth/operation-not-allowed') {
+        alert("The 'Anonymous' sign-in provider is not enabled. Please go to your Firebase Console -> Authentication -> Sign-in method, and enable 'Anonymous'.");
+      } else {
+        alert("Sign-in failed: " + e.message);
+      }
     }
   };
 
