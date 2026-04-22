@@ -19,6 +19,7 @@ interface AiAssistantProps {
     toggleLayer: (layer: any) => void;
     activeLayers: Set<any>;
     recenter: () => void;
+    focusRoute?: () => void;
     zoomIn: () => void;
     zoomOut: () => void;
     toggleMobileView?: () => void;
@@ -177,7 +178,7 @@ export default function AiAssistant({
       const assistantMessage: ChatMessage = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
-        content: `I've generated a perfect route for you: ${routeData.name}. It covers ${routeData.distanceKm}km with ${routeData.elevationGainM}m of elevation gain. ${routeData.description}`,
+        content: routeData.description,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         route: routeData
       };
@@ -283,6 +284,9 @@ export default function AiAssistant({
       onRouteGenerated(route);
       setLastGeneratedRoute(route);
       setActiveView('chat');
+      if (mapControls.focusRoute) {
+        setTimeout(() => mapControls.focusRoute!(), 100);
+      }
     }
   };
 
@@ -586,8 +590,8 @@ export default function AiAssistant({
                                   if (mapControls.mobileActiveView !== 'map' && mapControls.toggleMobileView) {
                                     mapControls.toggleMobileView();
                                   }
-                                  if (mapControls.recenter) {
-                                    mapControls.recenter();
+                                  if (mapControls.focusRoute) {
+                                    mapControls.focusRoute();
                                   }
                                 }}
                                 className="w-full flex items-center justify-center gap-2 mt-4 p-3 bg-primary-kinetic text-surface font-bold rounded-xl active:scale-95 transition-all shadow-lg shadow-primary-kinetic/20 hover:bg-primary-kinetic/90"

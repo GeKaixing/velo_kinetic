@@ -11,9 +11,10 @@ interface MapComponentProps {
   zoomLevel?: number;
   activeLayers: Set<MapLayerType>;
   recenterTrigger?: number;
+  routeFocusTrigger?: number;
 }
 
-export default function MapComponent({ path, userLocation, zoomLevel, activeLayers, recenterTrigger }: MapComponentProps) {
+export default function MapComponent({ path, userLocation, zoomLevel, activeLayers, recenterTrigger, routeFocusTrigger }: MapComponentProps) {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<L.Map | null>(null);
   const polylineRef = useRef<L.Polyline | null>(null);
@@ -44,22 +45,27 @@ export default function MapComponent({ path, userLocation, zoomLevel, activeLaye
 
       layersRef.current.dark = L.tileLayer(darkUrl, {
         maxZoom: 22,
+        zIndex: 1,
       });
 
       layersRef.current.light = L.tileLayer(lightUrl, {
         maxZoom: 22,
+        zIndex: 1,
       });
 
       layersRef.current.terrain = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
         maxZoom: 17,
+        zIndex: 1,
       });
 
       layersRef.current.cycling = L.tileLayer('https://tile.waymarkedtrails.org/cycling/{z}/{x}/{y}.png', {
         maxZoom: 18,
+        zIndex: 10,
       });
 
       layersRef.current.traffic = L.tileLayer(trafficUrl, {
         maxZoom: 22,
+        zIndex: 10,
       });
     }
 
@@ -70,25 +76,30 @@ export default function MapComponent({ path, userLocation, zoomLevel, activeLaye
         layersRef.current.dark?.remove();
         layersRef.current.light?.remove();
         layersRef.current.terrain?.addTo(mapRef.current);
+        layersRef.current.terrain?.bringToBack();
       } else if (activeLayers.has('light')) {
         layersRef.current.dark?.remove();
         layersRef.current.terrain?.remove();
         layersRef.current.light?.addTo(mapRef.current);
+        layersRef.current.light?.bringToBack();
       } else {
         layersRef.current.terrain?.remove();
         layersRef.current.light?.remove();
         layersRef.current.dark?.addTo(mapRef.current);
+        layersRef.current.dark?.bringToBack();
       }
 
       // Overlays
       if (activeLayers.has('cycling')) {
         layersRef.current.cycling?.addTo(mapRef.current);
+        layersRef.current.cycling?.bringToFront();
       } else {
         layersRef.current.cycling?.remove();
       }
 
       if (activeLayers.has('traffic')) {
         layersRef.current.traffic?.addTo(mapRef.current);
+        layersRef.current.traffic?.bringToFront();
       } else {
         layersRef.current.traffic?.remove();
       }
@@ -148,6 +159,18 @@ export default function MapComponent({ path, userLocation, zoomLevel, activeLaye
       polylineRef.current = null;
     }
   }, [path]);
+
+  useEffect(() => {
+    if (mapRef.current && path && path.length > 0 && routeFocusTrigger !== undefined && routeFocusTrigger > 0) {
+      const latLngs = path.map(p => [Number(p.lat), Number(p.lng)] as L.LatLngExpression);
+      const bounds = L.latLngBounds(latLngs);
+      mapRef.current.flyToBounds(bounds, { 
+        padding: [50, 50],
+        duration: 2,
+        easeLinearity: 0.25
+      });
+    }
+  }, [routeFocusTrigger]);
 
   useEffect(() => {
     if (mapRef.current && zoomLevel !== undefined) {

@@ -26,6 +26,7 @@ export default function App() {
   const [recenterTrigger, setRecenterTrigger] = useState(0);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [mobileActiveView, setMobileActiveView] = useState<'chat' | 'map'>('chat');
+  const [routeFocusTrigger, setRouteFocusTrigger] = useState(0);
 
   useEffect(() => {
     if (isDarkMode) {
@@ -96,6 +97,7 @@ export default function App() {
     toggleLayer,
     activeLayers,
     recenter: refreshUserLocation,
+    focusRoute: () => setRouteFocusTrigger(prev => prev + 1),
     zoomIn: () => setZoomLevel(prev => Math.min(prev + 1, 19)),
     zoomOut: () => setZoomLevel(prev => Math.max(prev - 1, 1)),
     toggleMobileView: () => setMobileActiveView(prev => prev === 'chat' ? 'map' : 'chat'),
@@ -214,6 +216,7 @@ export default function App() {
           zoomLevel={zoomLevel}
           activeLayers={activeLayers}
           recenterTrigger={recenterTrigger}
+          routeFocusTrigger={routeFocusTrigger}
         />
       </div>
 
