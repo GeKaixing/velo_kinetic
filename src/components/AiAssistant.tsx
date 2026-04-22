@@ -682,7 +682,7 @@ export default function AiAssistant({
                     <button 
                       onClick={() => setShowPlusMenu(!showPlusMenu)}
                       className={cn(
-                        "p-1.5 rounded-lg transition-colors mr-1",
+                        "flex items-center justify-center p-1.5 rounded-lg transition-colors mr-1",
                         showPlusMenu ? "text-primary-kinetic bg-primary-kinetic/10" : "text-on-surface/40 hover:text-primary-kinetic hover:bg-primary-kinetic/10"
                       )}
                     >
@@ -707,7 +707,7 @@ export default function AiAssistant({
                     <button 
                       onClick={toggleVoiceInput} 
                       className={cn(
-                        "p-1.5 rounded-lg transition-all relative overflow-hidden",
+                        "flex items-center justify-center p-1.5 rounded-lg transition-all relative overflow-hidden",
                         isListening ? "text-red-400 bg-red-400/10" : "text-primary-kinetic hover:bg-primary-kinetic/10"
                       )}
                     >
@@ -721,7 +721,7 @@ export default function AiAssistant({
                       )}
                       <Mic className={cn("w-5 h-5 relative z-10", isListening && "animate-pulse")} />
                     </button>
-                    <button onClick={() => handleSend()} className="p-1.5 rounded-lg text-primary-kinetic hover:bg-primary-kinetic/10 transition-colors">
+                    <button onClick={() => handleSend()} className="flex items-center justify-center p-1.5 rounded-lg text-primary-kinetic hover:bg-primary-kinetic/10 transition-colors">
                       <Send className="w-5 h-5" />
                     </button>
                   </div>

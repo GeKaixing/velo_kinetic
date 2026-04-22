@@ -18,6 +18,7 @@ export default function MapComponent({ path, userLocation, zoomLevel, activeLaye
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<L.Map | null>(null);
   const polylineRef = useRef<L.Polyline | null>(null);
+  const startMarkerRef = useRef<L.Marker | null>(null);
   const layersRef = useRef<Record<string, L.Layer>>({});
 
   useEffect(() => {
@@ -139,6 +140,9 @@ export default function MapComponent({ path, userLocation, zoomLevel, activeLaye
       if (polylineRef.current) {
         polylineRef.current.remove();
       }
+      if (startMarkerRef.current) {
+        startMarkerRef.current.remove();
+      }
 
       const latLngs = path.map(p => [Number(p.lat), Number(p.lng)] as L.LatLngExpression);
       polylineRef.current = L.polyline(latLngs, {
@@ -148,15 +152,31 @@ export default function MapComponent({ path, userLocation, zoomLevel, activeLaye
         lineJoin: 'round'
       }).addTo(mapRef.current);
 
+      const bikeIconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18.5" cy="17.5" r="3.5"/><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="15" cy="5" r="1"/><path d="M12 17.5V14l-3-3 4-3 2 3h2"/></svg>`;
+      const bikeIcon = L.divIcon({
+        html: `<div style="background: #ff5722; color: white; border-radius: 50%; padding: 4px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); border: 2px solid white; display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; box-sizing: border-box;">${bikeIconSvg}</div>`,
+        className: '',
+        iconSize: [32, 32],
+        iconAnchor: [16, 16],
+      });
+
+      startMarkerRef.current = L.marker(latLngs[0], { icon: bikeIcon }).addTo(mapRef.current);
+
       const bounds = L.latLngBounds(latLngs);
       mapRef.current.flyToBounds(bounds, { 
         padding: [50, 50],
         duration: 2,
         easeLinearity: 0.25
       });
-    } else if (polylineRef.current) {
-      polylineRef.current.remove();
-      polylineRef.current = null;
+    } else {
+      if (polylineRef.current) {
+        polylineRef.current.remove();
+        polylineRef.current = null;
+      }
+      if (startMarkerRef.current) {
+        startMarkerRef.current.remove();
+        startMarkerRef.current = null;
+      }
     }
   }, [path]);
 
